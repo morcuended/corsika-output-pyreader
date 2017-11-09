@@ -6,4 +6,4 @@ So far only tested for CORSIKA Version 7.6300 (https://web.ikp.kit.edu/corsika/u
 
 Not implemented for IACT option yet.
 
-test
+tested
