@@ -1,6 +1,8 @@
 '''
 This script reads the input arguments passed in the DATA CARD.
 
+So far not implemented for all of the input arguments.
+
 In this configuration, "all" file must be placed in the parent directory,
 from where test.py script is run
 
@@ -13,10 +15,11 @@ import os, sys
 # =========  DATA CARD =========
 with open("all", 'r') as f:
     read_data = f.read()
-    #print(read_data) 
-    datacard = ascii.read(read_data, format='fixed_width_no_header'
+    datacard = ascii.read(read_data
+                          , format='fixed_width_no_header'
                           , delimiter=' '
-                          , col_starts=(0, 8, 39))
+                          , col_starts=(0, 8, 39)
+                          )
 f.closed
 
 nshower = int(datacard[2][1].split()[0])
@@ -38,5 +41,5 @@ fluorsize = float(datacard[24][1].split()[0])
 x_area = float(datacard[27][1].split()[4])
 y_area = float(datacard[27][1].split()[5])
 
-# Just for check
+# Just for checking
 print("Reading DATACARD")
