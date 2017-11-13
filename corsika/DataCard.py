@@ -4,8 +4,7 @@ This script reads the input arguments passed in the DATA CARD.
 So far not implemented for all of the input arguments.
 
 In this configuration, "all" file must be placed in the parent directory,
-from where test.py script is run
-
+from where test.py script is run.
 '''
 
 import numpy as np

@@ -1,3 +1,5 @@
 # Compiled Python files
 corsika/__pycache__/
 *__pycache__*
+CER*
+all
