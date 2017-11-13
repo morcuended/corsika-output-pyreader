@@ -1,6 +1,4 @@
-'''
-Script aimed to histogram photon bunches that reach observation level
-'''
+
 
 import numpy as np
 from scipy.io import FortranFile
@@ -15,6 +13,9 @@ import sys, os
 
 
 def histogram(bunches, x_area, y_area, theta):
+    """
+    Histogram photon bunches that reach observation level
+    """
     fov = np.cos(5 * pi / 180)  # FoV contraint (+/- 5 deg)
     # Histogramming along x-axis
     if x_area > y_area:
