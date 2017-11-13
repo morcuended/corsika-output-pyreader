@@ -3,7 +3,6 @@ This script reads Cherenkov and fluorescence photon bunches
 from all events in the CORSIKA output.
 '''
 
-from corsika import histogram, DataCard
 import sys, os
 import argparse
 from itertools import compress
