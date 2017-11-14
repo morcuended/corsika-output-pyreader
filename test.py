@@ -77,7 +77,7 @@ photons = 0
 while True:
     count = count + 1
     # Sort data in 21 sub-blocks of 39 lines each (and 7 columns)
-    data = np.split(file.read_reals(dtype=np.float32).reshape(-1, 7), 21)
+    data = np.split(file.read_reals(dtype = np.float32).reshape(-1, 7), 21)
     # It should be:
     # indices_boolean = [np.abs(i[0][0])<max(cersize, fluorsize) for i in data]
     # select only sub-blocks of bunches
@@ -87,20 +87,21 @@ while True:
     bunches = np.vstack([bunches, np.vstack(compress(data, indices_boolean))])
     # drop those lines containing only zeros
     bunches = bunches[np.all(bunches != 0, axis=1)]
+    # print(bunches[bunches[:, 0] > 0])
 
     # Not store sub-blocks to bunches array every time to speed the process up
     if count == 10:
-        h_c = histogram.PhotonBunches(bunches[bunches[:, 0] > 0]
-                                      , data_card['XCERARY']
-                                      , data_card['YCERARY']
-                                      , pointing_angle
-                                      , data_card['NSHOW']
+        h_c = histogram.PhotonBunches(bunches[bunches[:, 0] > 0],
+                                      data_card['XCERARY'],
+                                      data_card['YCERARY'],
+                                      pointing_angle,
+                                      data_card['NSHOW']
                                       )
-        h_f = histogram.PhotonBunches(bunches[bunches[:, 0] < 0]
-                                      , data_card['XCERARY']
-                                      , data_card['YCERARY']
-                                      , pointing_angle
-                                      , data_card['NSHOW']
+        h_f = histogram.PhotonBunches(bunches[bunches[:, 0] < 0],
+                                      data_card['XCERARY'],
+                                      data_card['YCERARY'],
+                                      pointing_angle,
+                                      data_card['NSHOW']
                                       )
         hist_c = hist_c + h_c
         hist_f = hist_f + h_f
@@ -109,17 +110,17 @@ while True:
 
     if any(3300 < i < 3303. for i in indices):  # Flag indicating RUN END sub-block
         if count < 10:
-            h_c = histogram.PhotonBunches(bunches[bunches[:, 0] > 0]
-                                          , data_card['XCERARY']
-                                          , data_card['YCERARY']
-                                          , pointing_angle
-                                          , data_card['NSHOW']
+            h_c = histogram.PhotonBunches(bunches[bunches[:, 0] > 0],
+                                          data_card['XCERARY'],
+                                          data_card['YCERARY'],
+                                          pointing_angle,
+                                          data_card['NSHOW']
                                           )
-            h_f = histogram.PhotonBunches(bunches[bunches[:, 0] < 0]
-                                          , data_card['XCERARY']
-                                          , data_card['YCERARY']
-                                          , pointing_angle
-                                          , data_card['NSHOW']
+            h_f = histogram.PhotonBunches(bunches[bunches[:, 0] < 0],
+                                          data_card['XCERARY'],
+                                          data_card['YCERARY'],
+                                          pointing_angle,
+                                          data_card['NSHOW']
                                           )
             hist_c = hist_c + h_c
             hist_f = hist_f + h_f
@@ -155,10 +156,12 @@ np.savetxt('%iGeV_%ish_%ideg_%i%s_hist_%s.dat' % (data_card['ERANGE'],
                      ' Theta prim. part. incidence: %i deg \n Obs level (m): %i \n Atmosp model: %i'
                      % (data_card['THETAP'],
                         data_card['OBSLEV'],
-                        data_card['ATMOD']) +
+                        data_card['ATMOD'])
+                     +
                      '\n Cerenk_bunch_size: %i \n Fluor_bunch_size: %i'
-                     % (data_card['CERSIZ'], data_card['FLSIZE']) +
-                     '\n  \n Distance to shower axis (m) | Phot_density_Cher/fluor (1/m2)'
+                     % (data_card['CERSIZ'], data_card['FLSIZE'])
+                     +
+                     '\n Distance to shower axis (m) | Phot_density_Cher/fluor (1/m2)'
                      )
            )
 print('Histogram stored into: %iGeV_%ish_%ideg_%i%s_hist_%s.dat'

@@ -50,7 +50,7 @@ def PhotonBunches(bunches, x_area, y_area, theta, nshower):
         mids = mids[0:numbins]
         ring = pi * ((radius[1:]) ** 2 - (radius[0:numbins]) ** 2)
 
-    bunches = np.array([]).reshape(0, 7)
+    # bunches = np.array([]).reshape(0, 7)
     hist_c = np.zeros((2, numbins))
     hist_f = np.zeros((2, numbins))
 
