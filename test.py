@@ -18,7 +18,6 @@ from math import pi
 import numpy as np
 from scipy.io import FortranFile
 
-
 data_card = DataCard.read(sys.argv[2])
 # Telescope pointing angle
 onaxis = input("On-axis pointing (y/n)? ")
@@ -30,7 +29,7 @@ else:
     pointing = 'offaxis'
 
 # Histogram definition depending on the detection area
-binsize = 10 #meters
+binsize = 10  # meters
 
 if data_card['XCERARY'] > data_card['XCERARY']:
     print("Histogram along x-axis...")
@@ -55,7 +54,7 @@ elif data_card['XCERARY'] < data_card['YCERARY']:
 else:
     print("Histogram radially...")
     type_of_hist = 'r'
-    maxlen  = 1e-2 * data_card['XCERARY'] / 2
+    maxlen = 1e-2 * data_card['XCERARY'] / 2
     numbins = int(maxlen / binsize)
     breaks = numbins + 1
     radius = np.linspace(0, maxlen, breaks)
@@ -91,14 +90,18 @@ while True:
 
     # Not store sub-blocks to bunches array every time to speed the process up
     if count == 10:
-        h_c = histogram(bunches[bunches[:, 0] > 0]
-                        , data_card['XCERARY']
-                        , data_card['YCERARY']
-                        , pointing_angle)
-        h_f = histogram(bunches[bunches[:, 0] < 0]
-                        , data_card['XCERARY']
-                        , data_card['YCERARY']
-                        , pointing_angle)
+        h_c = histogram.PhotonBunches(bunches[bunches[:, 0] > 0]
+                                      , data_card['XCERARY']
+                                      , data_card['YCERARY']
+                                      , pointing_angle
+                                      , data_card['NSHOW']
+                                      )
+        h_f = histogram.PhotonBunches(bunches[bunches[:, 0] < 0]
+                                      , data_card['XCERARY']
+                                      , data_card['YCERARY']
+                                      , pointing_angle
+                                      , data_card['NSHOW']
+                                      )
         hist_c = hist_c + h_c
         hist_f = hist_f + h_f
         count = 0  # reset counter
@@ -106,14 +109,18 @@ while True:
 
     if any(3300 < i < 3303. for i in indices):  # Flag indicating RUN END sub-block
         if count < 10:
-            h_c = histogram(bunches[bunches[:, 0] > 0]
-                            , data_card['XCERARY']
-                            , data_card['YCERARY']
-                            , pointing_angle)
-            h_f = histogram(bunches[bunches[:, 0] < 0]
-                            , data_card['XCERARY']
-                            , data_card['YCERARY']
-                            , pointing_angle)
+            h_c = histogram.PhotonBunches(bunches[bunches[:, 0] > 0]
+                                          , data_card['XCERARY']
+                                          , data_card['YCERARY']
+                                          , pointing_angle
+                                          , data_card['NSHOW']
+                                          )
+            h_f = histogram.PhotonBunches(bunches[bunches[:, 0] < 0]
+                                          , data_card['XCERARY']
+                                          , data_card['YCERARY']
+                                          , pointing_angle
+                                          , data_card['NSHOW']
+                                          )
             hist_c = hist_c + h_c
             hist_f = hist_f + h_f
         file.close()
@@ -127,3 +134,38 @@ while True:
 #     args = parser.parse_args()
 #
 #     # train(variable_input_model, args.h5_file, args.epochs, args.image_summary, args.embedding)
+
+
+np.savetxt('%iGeV_%ish_%ideg_%i%s_hist_%s.dat' % (data_card['ERANGE'],
+                                                  data_card['NSHOW'],
+                                                  data_card['THETAP'],
+                                                  pointing_angle,
+                                                  pointing,
+                                                  type_of_hist),
+           np.transpose([mids, hist_c[0], hist_c[1], hist_f[0], hist_f[1]])
+           , newline='\n'
+           , fmt="%7.2f %1.6e %1.6e %1.6e %1.6e"
+           , header=(' Num_showers:%i \n E_primary (GeV): %i \n ID_prim_particle: %s \n Seeds: %i, %i \n'
+                     % (data_card['NSHOW'],
+                        data_card['ERANGE'],
+                        data_card['PRMPAR'],
+                        data_card['SEED1'],
+                        data_card['SEED2'])
+                     +
+                     ' Theta prim. part. incidence: %i deg \n Obs level (m): %i \n Atmosp model: %i'
+                     % (data_card['THETAP'],
+                        data_card['OBSLEV'],
+                        data_card['ATMOD']) +
+                     '\n Cerenk_bunch_size: %i \n Fluor_bunch_size: %i'
+                     % (data_card['CERSIZ'], data_card['FLSIZE']) +
+                     '\n  \n Distance to shower axis (m) | Phot_density_Cher/fluor (1/m2)'
+                     )
+           )
+print('Histogram stored into: %iGeV_%ish_%ideg_%i%s_hist_%s.dat'
+      % (data_card['ERANGE'],
+         data_card['NSHOW'],
+         data_card['THETAP'],
+         pointing_angle,
+         pointing,
+         type_of_hist)
+      )

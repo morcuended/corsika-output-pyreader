@@ -9,3 +9,6 @@ corsika/CER*
 corsika/all*
 
 .idea/
+
+# reader output files
+*GeV*
