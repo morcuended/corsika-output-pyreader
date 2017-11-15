@@ -11,15 +11,15 @@ import matplotlib.style
 import matplotlib as mpl
 import sys, os
 
-def PhotonBunches(bunches, x_area, y_area, theta, nshower):
-    """
-    Histogram photon bunches that reach observation level
-    """
 
-    # Should I avoid define histogram every time this function is called?
-
-    # Histogram definition depending on the detection area
+def definition(x_area, y_area):
+    """
+    Definition of the histogram depending on the detection area
+    """
+    # global bunches, maxlen, ring, radius, hist_c, hist_f
+    # bunches = np.array([]).reshape(0, 7)
     binsize = 10  # meters
+
 
     if x_area > y_area:
         # print("Histogram along x-axis...")
@@ -52,19 +52,28 @@ def PhotonBunches(bunches, x_area, y_area, theta, nshower):
         mids = mids[0:numbins]
         ring = pi * ((radius[1:]) ** 2 - (radius[0:numbins]) ** 2)
 
-    # bunches = np.array([]).reshape(0, 7)
     hist_c = np.zeros((2, numbins))
     hist_f = np.zeros((2, numbins))
 
+
+def PhotonBunches(bunches, x_area, y_area, theta, nshower):
+
+    # definition(x_area,y_area)
+    """
+    Histogram photon bunches that reach observation level
+    """
+
+    # Should I avoid define histogram every time this function is called?
+    maxlen = max(x_area, y_area)
     fov = np.cos(5 * pi / 180)  # FoV contraint (+/- 5 deg)
     # Histogramming along x-axis
     if x_area > y_area:
         weighted_pht = np.abs(bunches[:, 0]) / (binsize ** 2 * nshower)
         #        if with_fov == 'n': # all photons
         h, edges = np.histogram(1e-2 * bunches[:, 1],
-                                bins = distances,
-                                weights = weighted_pht,
-                                range = [0., maxlen]
+                                bins=distances,
+                                weights=weighted_pht,
+                                range=[0., maxlen]
                                 )
         wemis = np.sqrt(1 - bunches[:, 3] ** 2 - bunches[:, 4] ** 2)
         # Pointing the telescope along the shower direction (on-axis)
@@ -74,9 +83,9 @@ def PhotonBunches(bunches, x_area, y_area, theta, nshower):
         bunches_fov = bunches[wemis >= fov]
         weighted_pht_fov = weighted_pht[wemis >= fov]
         h_fov, edges = np.histogram(1e-2 * bunches_fov[:, 1],
-                                    bins = distances,
-                                    weights = weighted_pht_fov,
-                                    range = [0., maxlen]
+                                    bins= distances,
+                                    weights= weighted_pht_fov,
+                                    range= [0., maxlen]
                                     )
     elif x_area < y_area:
         weighted_pht = np.abs(bunches[:, 0]) / (binsize ** 2 * nshower)
@@ -97,7 +106,6 @@ def PhotonBunches(bunches, x_area, y_area, theta, nshower):
                                     weights = weighted_pht_fov,
                                     range = [0., maxlen]
                                     )
-
 
     # Histogramming radially
     else:
