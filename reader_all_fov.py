@@ -52,11 +52,11 @@ def histogram(bunches, x_area, y_area, theta):
     if x_area > y_area:  
         weighted_pht = np.abs(bunches[:, 0]) / (binsize**2 * nshower)
 #        if with_fov == 'n': # all photons
-        h,edges = np.histogram(1e-2 * bunches[:, 1]
-	              	       , bins = distances
-	   		       , weights = weighted_pht
-	   		       , range = [0., maxlen]
-                               )
+        h, edges = np.histogram(1e-2 * bunches[:, 1],
+                                bins = distances,
+                                weights = weighted_pht,
+                                range = [0., maxlen]
+                                )
 #        else: # 10 deg FoV
         wemis = np.sqrt(1-bunches[:, 3]**2 - bunches[:, 4]**2)
         # Pointing the telescope along the shower direction (on-axis) 
@@ -73,11 +73,11 @@ def histogram(bunches, x_area, y_area, theta):
     elif x_area < y_area:  
         weighted_pht = np.abs(bunches[:, 0]) / (binsize**2 * nshower)
 #        if with_fov == 'n': # all photons
-        h,edges = np.histogram(1e-2 * bunches[:, 2]
-	    		   , bins = distances
-	    		   , weights = weighted_pht
-	    		   , range = [0., maxlen]
-                           )
+        h,edges = np.histogram(1e-2 * bunches[:, 2],
+                               bins = distances,
+                               weights = weighted_pht,
+                               range = [0., maxlen]
+                               )
 #        else: # 10 deg FoV
         wemis = np.sqrt(1 - bunches[:, 3]**2 - bunches[:, 4]**2)
         # Pointing telescope along the shower direction (on-axis) 
