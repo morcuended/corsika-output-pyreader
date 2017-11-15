@@ -10,7 +10,7 @@ Variables in capital letters corespond to datacard input arguments
 '''
 
 # from corsika.DataCard import data_card
-from corsika import histogram, DataCard
+import histogram, DataCard
 import sys
 import os
 import argparse
@@ -18,8 +18,6 @@ from itertools import compress
 from math import pi
 import numpy as np
 from scipy.io import FortranFile
-
-
 
 data_card = DataCard.read(sys.argv[2])
 
