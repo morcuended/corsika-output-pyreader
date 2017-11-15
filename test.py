@@ -9,7 +9,6 @@ Usage: It takes CERnnnnnn and DATACARD files as input arguments:
 Variables in capital letters corespond to datacard input arguments
 '''
 
-# from corsika.DataCard import data_card
 import histogram, DataCard
 import sys
 import os
@@ -21,8 +20,7 @@ from scipy.io import FortranFile
 
 data_card = DataCard.read(sys.argv[2])
 
-# DataCard.read(sys.argv[2])
-# Telescope pointing angle
+# Define telescope pointing angle
 onaxis = input("On-axis pointing (y/n)? ")
 if onaxis == 'y':
     pointing_angle = data_card['THETAP']
@@ -129,15 +127,6 @@ while True:
             hist_f = hist_f + h_f
         file.close()
         break
-
-# if __name__ == '__main__':
-#     # parse command line arguments
-#     parser = argparse.ArgumentParser(description='Read photon bunches from CORSIKA standard output file')
-#     parser.add_argument('CERnnnnnn', help='path to CERnnnnnn binary file containing data')
-#     parser.add_argument('--datacard', default='all')
-#     args = parser.parse_args()
-#
-#     # train(variable_input_model, args.h5_file, args.epochs, args.image_summary, args.embedding)
 
 
 np.savetxt('%iGeV_%ish_%ideg_%i%s_hist_%s.dat' % (data_card['ERANGE'],

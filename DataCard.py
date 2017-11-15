@@ -1,9 +1,5 @@
 from astropy.io import ascii
 
-import os
-import sys
-
-# Open DATA CARD
 def read(data_card_file):
     """
     It reads the input arguments passed in the DATA CARD.
