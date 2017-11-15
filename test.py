@@ -2,13 +2,14 @@
 This script reads Cherenkov and fluorescence photon bunches
 from all events in the CORSIKA output.
 
-Usage: It takes CERnnnnnn and DATACARD files as input arguments.
+Usage: It takes CERnnnnnn and DATACARD files as input arguments:
 
     python test.py CERnnnnnn all
 
 Variables in capital letters corespond to datacard input arguments
 '''
 
+# from corsika.DataCard import data_card
 from corsika import histogram, DataCard
 import sys
 import os
@@ -18,7 +19,11 @@ from math import pi
 import numpy as np
 from scipy.io import FortranFile
 
+
+
 data_card = DataCard.read(sys.argv[2])
+
+# DataCard.read(sys.argv[2])
 # Telescope pointing angle
 onaxis = input("On-axis pointing (y/n)? ")
 if onaxis == 'y':
@@ -61,7 +66,7 @@ else:
     mids = ((radius[1] - radius[0]) / 2) + radius
     mids = mids[0:numbins]
     ring = pi * ((radius[1:]) ** 2 - (radius[0:numbins]) ** 2)
-
+#
 bunches = np.array([]).reshape(0, 7)
 hist_c = np.zeros((2, numbins))
 hist_f = np.zeros((2, numbins))
