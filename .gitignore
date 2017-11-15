@@ -1,12 +1,9 @@
 # Compiled Python files
-corsika/__pycache__/
-*__pycache__*
+__pycache__
 
 # CORSIKA output files
 CER*
 all
-corsika/CER*
-corsika/all*
 
 .idea/
 
