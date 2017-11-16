@@ -6,34 +6,26 @@ from astropy.io import ascii
 import sys
 
 ''' 
-Ways to histogram showers (analogous to indicate where the telescope
-is pointing):
-  - on axis if theta_telesc = theta_primary
-  - off axis (else)
-  
-Run this script as:
+Histogram Cherenkov and fluorescence photon bunches
+on the ground.
+ 
+Usage:
 
-    python reader.py <filename_from_CORSIKA> <DATACARDname>
-
-Then sys.argv[1] gets <filename_from_CORSIKA> as the 
-file that will be analyze here and so sys.argv[2] gets the DATACARD
-Also, the "all" DATA CARD file must be in the same directory.
+    python reader.py path_to_output_file_from_CORSIKA DATACARD_file
 
 TO DO list:
   (x) Establish a way of pointing the telescope to any direction
       via theta angle. 
-  (x) Ask if user wants onaxis pointing, if not, ask for the pointing 
-      angle of the telescope.
-  (-) Convert pointing angle to off-axis angle with respect to the shower axis direction.
+  (x) Ask if user wants on-axis pointing, if not, ask for the 
+      pointing angle of the telescope.
+  (-) Convert pointing angle to off-axis angle with respect to the 
+      shower axis direction.
   (-) If any argument is passed, CER000001 should be set
       as default input file.
-  (x) Distinguish fluor/Cherenkov photons in order to histogramming both 
-      components separately.
-  (-) Store photon bunches w/ and w/o FoV constraint at the same time? 
-      Would this be useful/efficient in the future (if we only want to store FoV-constrained photons)?
-  (-) Average x/y-hitogramming.The idea is to have to diferent DATACARD with detector area defined 
-      along both axis (x/y) with the corresponding shower direction for each one.
-  (-) Check which dimension is the largest one, then histogramming along
+  (-) Average x/y-histogram.The idea is to have to different DATACARD
+      with detector area defined along both axis (x/y) with the
+      corresponding shower direction for each one.
+  (-) Check which dimension is the largest one, then histogram along
       that direction.
 '''
 
