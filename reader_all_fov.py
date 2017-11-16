@@ -146,7 +146,9 @@ else:
     pointing_angle = input("Off-axis angle? ")
     pointing = 'offaxis'
 
+# Open CORSIKA output binary file
 file = FortranFile(sys.argv[1], 'r')
+
 # Histograms definition
 binsize = 10  # meters
 
@@ -193,11 +195,14 @@ while True:
     # Sort data in 21 sub-blocks of 39 lines each
     data = np.split(file.read_reals(dtype=np.float32).reshape(-1, 7), 21) 
     # It should be:
-    # indices_boolean = [np.abs(i[0][0])<max(cersize,fluorsize) for i in data]
-    indices_boolean = [np.abs(i[0][0]) < 100 for i in data] # select only subblocks of bunches
-    indices = [i[0][0] for i in data] # store 1st element of each subblock
+    # indices_boolean = [np.abs(i[0][0])<max(cersize, fluorsize) for i in data]
+    # Select only sub-blocks of bunches
+    indices_boolean = [np.abs(i[0][0]) < 100 for i in data]
+    # Store 1st element of each sub-block
+    indices = [i[0][0] for i in data]
     bunches = np.vstack([bunches, np.vstack(compress(data, indices_boolean))])
-    bunches = bunches[np.all(bunches != 0, axis = 1)] # drop those lines containing only zeros 
+    # Drop those lines containing only zeros
+    bunches = bunches[np.all(bunches != 0, axis=1)]
 
     if count == 10:
         h_c = histogram(bunches[bunches[:, 0] > 0],
@@ -242,26 +247,26 @@ np.savetxt('%iGeV_%ish_%ideg_%i%s_hist_%s.dat' % (data_card['ERANGE'],
                                                   pointing_angle,
                                                   pointing,
                                                   type_of_hist),
-           np.transpose([mids, hist_c[0], hist_c[1], hist_f[0], hist_f[1]])
-           , newline='\n'
-           , fmt="%7.2f %1.6e %1.6e %1.6e %1.6e"
-           , header=(' Num_showers:%i \n E_primary (GeV): %i \n ID_prim_particle: %s \n Seeds: %i, %i \n'
-                     % (data_card['NSHOW'],
-                        data_card['ERANGE'],
-                        data_card['PRMPAR'],
-                        data_card['SEED1'],
-                        data_card['SEED2'])
-                     +
-                     ' Theta prim. part. incidence: %i deg \n Obs level (m): %i \n Atmosp model: %i'
-                     % (data_card['THETAP'],
-                        data_card['OBSLEV'],
-                        data_card['ATMOD'])
-                     +
-                     '\n Cerenk_bunch_size: %i \n Fluor_bunch_size: %i'
-                     % (data_card['CERSIZ'], data_card['FLSIZE'])
-                     +
-                     '\n Distance to shower axis (m) | Phot_density_Cher/fluor (1/m2)'
-                     )
+           np.transpose([mids, hist_c[0], hist_c[1], hist_f[0], hist_f[1]]),
+           newline='\n',
+           fmt="%7.2f %1.6e %1.6e %1.6e %1.6e",
+           header=(' Num_showers:%i \n E_primary (GeV): %i \n ID_prim_particle: %s \n Seeds: %i, %i \n'
+                   % (data_card['NSHOW'],
+                      data_card['ERANGE'],
+                      data_card['PRMPAR'],
+                      data_card['SEED1'],
+                      data_card['SEED2'])
+                   +
+                   ' Theta prim. part. incidence: %i deg \n Obs level (m): %i \n Atmosp model: %i'
+                   % (data_card['THETAP'],
+                      data_card['OBSLEV'],
+                      data_card['ATMOD'])
+                   +
+                   '\n Cerenk_bunch_size: %i \n Fluor_bunch_size: %i'
+                   % (data_card['CERSIZ'], data_card['FLSIZE'])
+                   +
+                   '\n Distance to shower axis (m) | Phot_density_Cher/fluor (1/m2)'
+                   )
            )
 print('Histogram stored into: %iGeV_%ish_%ideg_%i%s_hist_%s.dat' %
       (data_card['ERANGE'], data_card['NSHOW'], data_card['THETAP'],

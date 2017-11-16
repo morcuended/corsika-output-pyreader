@@ -9,7 +9,8 @@ Usage: It takes CERnnnnnn and DATACARD files as input arguments:
 Variables in capital letters corespond to datacard input arguments
 """
 
-import histogram, DataCard
+import histogram
+import DataCard
 import sys
 from itertools import compress
 import numpy as np
@@ -74,7 +75,7 @@ photons = 0
 while True:
     count = count + 1
     # Sort data in 21 sub-blocks of 39 lines each (and 7 columns)
-    data = np.split(file.read_reals(dtype = np.float32).reshape(-1, 7), 21)
+    data = np.split(file.read_reals(dtype=np.float32).reshape(-1, 7), 21)
     # It should be:
     # indices_boolean = [np.abs(i[0][0])<max(cersize, fluorsize) for i in data]
     # select only sub-blocks of bunches
@@ -130,26 +131,26 @@ np.savetxt('%iGeV_%ish_%ideg_%i%s_hist_%s.dat' % (data_card['ERANGE'],
                                                   pointing_angle,
                                                   pointing,
                                                   type_of_hist),
-           np.transpose([mids, hist_c[0], hist_c[1], hist_f[0], hist_f[1]])
-           , newline='\n'
-           , fmt="%7.2f %1.6e %1.6e %1.6e %1.6e"
-           , header=(' Num_showers:%i \n E_primary (GeV): %i \n ID_prim_particle: %s \n Seeds: %i, %i \n'
-                     % (data_card['NSHOW'],
-                        data_card['ERANGE'],
-                        data_card['PRMPAR'],
-                        data_card['SEED1'],
-                        data_card['SEED2'])
-                     +
-                     ' Theta prim. part. incidence: %i deg \n Obs level (m): %i \n Atmosp model: %i'
-                     % (data_card['THETAP'],
-                        data_card['OBSLEV'],
-                        data_card['ATMOD'])
-                     +
-                     '\n Cerenk_bunch_size: %i \n Fluor_bunch_size: %i'
-                     % (data_card['CERSIZ'], data_card['FLSIZE'])
-                     +
-                     '\n Distance to shower axis (m) | Phot_density_Cher/fluor (1/m2)'
-                     )
+           np.transpose([mids, hist_c[0], hist_c[1], hist_f[0], hist_f[1]]),
+           newline='\n',
+           fmt="%7.2f %1.6e %1.6e %1.6e %1.6e",
+           header=(' Num_showers:%i \n E_primary (GeV): %i \n ID_prim_particle: %s \n Seeds: %i, %i \n'
+                   % (data_card['NSHOW'],
+                      data_card['ERANGE'],
+                      data_card['PRMPAR'],
+                      data_card['SEED1'],
+                      data_card['SEED2'])
+                   +
+                   ' Theta prim. part. incidence: %i deg \n Obs level (m): %i \n Atmosp model: %i'
+                   % (data_card['THETAP'],
+                      data_card['OBSLEV'],
+                      data_card['ATMOD'])
+                   +
+                   '\n Cerenk_bunch_size: %i \n Fluor_bunch_size: %i'
+                   % (data_card['CERSIZ'], data_card['FLSIZE'])
+                   +
+                   '\n Distance to shower axis (m) | Phot_density_Cher/fluor (1/m2)'
+                   )
            )
 print('Histogram stored into: %iGeV_%ish_%ideg_%i%s_hist_%s.dat' %
       (data_card['ERANGE'], data_card['NSHOW'], data_card['THETAP'],
