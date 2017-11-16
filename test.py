@@ -1,4 +1,4 @@
-'''
+"""
 This script reads Cherenkov and fluorescence photon bunches
 from all events in the CORSIKA output.
 
@@ -7,48 +7,52 @@ Usage: It takes CERnnnnnn and DATACARD files as input arguments:
     python test.py CERnnnnnn all
 
 Variables in capital letters corespond to datacard input arguments
-'''
+"""
 
 import histogram, DataCard
 import sys
-from astropy.io import ascii
-import os
-import argparse
 from itertools import compress
-from math import pi
 import numpy as np
 from scipy.io import FortranFile
 
-global binsize, bunches, maxlen, ring, radius, hist_c, hist_f, data_card
+data_card = DataCard.read(sys.argv[2])
+
+# Definition of the histogram depending on the detection area
 bunches = np.array([]).reshape(0, 7)
 binsize = 10  # meters
 
-# data_card = DataCard.read(sys.argv[2])
+if data_card['XCERARY'] > data_card['YCERARY']:
+    # print("Histogram along x-axis...")
+    type_of_hist = 'x'
+    maxlen = 1e-2 * data_card['XCERARY'] / 2
+    numbins = int(maxlen / binsize)
+    breaks = numbins + 1
+    distances = np.linspace(0, maxlen, breaks)
+    mids = ((distances[1] - distances[0]) / 2) + distances
+    mids = mids[0:numbins]
 
-with open(sys.argv[2], 'r') as f:
-    read_data = f.read()
-    datacard = ascii.read(read_data, format='fixed_width_no_header',
-                          delimiter=' ', col_starts=(0, 8, 39)
-                          )
-data_card = {
-    'NSHOW': int(datacard[2][1].split()[0]),
-    'ERANGE': float(datacard[5][1].split()[1]),
-    'PRMPAR': int(datacard[3][1].split()[0]),
-    'SEED1': int(datacard[8][1].split()[0]),
-    'SEED2': int(datacard[9][1].split()[0]),
-    'THETAP': float(datacard[6][1].split()[0]),
-    'PHIP': float(datacard[7][1].split()[0]),
-    'OBSLEV': float(datacard[10][1].split()[0]) * 1e-2,
-    'ATMOD': int(datacard[18][1].split()[0]),
-    'CERSIZ': float(datacard[23][1].split()[0]),
-    'FLSIZE': float(datacard[24][1].split()[0]),
-    'XCERARY': float(datacard[27][1].split()[4]),
-    'YCERARY': float(datacard[27][1].split()[5])
-}
+elif data_card['XCERARY'] < data_card['YCERARY']:
+    # print("Histogram along y-axis...")
+    type_of_hist = 'y'
+    maxlen = 1e-2 * data_card['YCERARY'] / 2
+    numbins = int(maxlen / binsize)
+    breaks = numbins + 1
+    distances = np.linspace(0, maxlen, breaks)
+    mids = ((distances[1] - distances[0]) / 2) + distances
+    mids = mids[0:numbins]
 
-histogram.definition(data_card['XCERARY'], data_card['YCERARY'])
+else:
+    # print("Histogram radially...")
+    type_of_hist = 'r'
+    maxlen = 1e-2 * data_card['XCERARY'] / 2
+    numbins = int(maxlen / binsize)
+    breaks = numbins + 1
+    radius = np.linspace(0, maxlen, breaks)
+    mids = ((radius[1] - radius[0]) / 2) + radius
+    mids = mids[0:numbins]
 
-maxlen = max(data_card['XCERARY'], data_card['YCERARY'])
+hist_c = np.zeros((2, numbins))
+hist_f = np.zeros((2, numbins))
 
 # Define telescope pointing angle
 onaxis = input("On-axis pointing (y/n)? ")
@@ -58,44 +62,6 @@ if onaxis == 'y':
 else:
     pointing_angle = input("Off-axis angle? ")
     pointing = 'offaxis'
-
-# # Histogram definition depending on the detection area
-# binsize = 10  # meters
-#
-# if data_card['XCERARY'] > data_card['XCERARY']:
-#     print("Histogram along x-axis...")
-#     type_of_hist = 'x'
-#     maxlen = 1e-2 * data_card['XCERARY'] / 2
-#     numbins = int(maxlen / binsize)
-#     breaks = numbins + 1
-#     distances = np.linspace(0, maxlen, breaks)
-#     mids = ((distances[1] - distances[0]) / 2) + distances
-#     mids = mids[0:numbins]
-#
-# elif data_card['XCERARY'] < data_card['YCERARY']:
-#     print("Histogram along y-axis...")
-#     type_of_hist = 'y'
-#     maxlen = 1e-2 * data_card['YCERARY'] / 2
-#     numbins = int(maxlen / binsize)
-#     breaks = numbins + 1
-#     distances = np.linspace(0, maxlen, breaks)
-#     mids = ((distances[1] - distances[0]) / 2) + distances
-#     mids = mids[0:numbins]
-#
-# else:
-#     print("Histogram radially...")
-#     type_of_hist = 'r'
-#     maxlen = 1e-2 * data_card['XCERARY'] / 2
-#     numbins = int(maxlen / binsize)
-#     breaks = numbins + 1
-#     radius = np.linspace(0, maxlen, breaks)
-#     mids = ((radius[1] - radius[0]) / 2) + radius
-#     mids = mids[0:numbins]
-#     ring = pi * ((radius[1:]) ** 2 - (radius[0:numbins]) ** 2)
-# #
-bunches = np.array([]).reshape(0, 7)
-# hist_c = np.zeros((2, numbins))
-# hist_f = np.zeros((2, numbins))
 
 # Open binary CORSIKA output file
 file = FortranFile(sys.argv[1], 'r')
@@ -118,7 +84,6 @@ while True:
     bunches = np.vstack([bunches, np.vstack(compress(data, indices_boolean))])
     # drop those lines containing only zeros
     bunches = bunches[np.all(bunches != 0, axis=1)]
-    # print(bunches[bunches[:, 0] > 0])
 
     # Not store sub-blocks to bunches array every time to speed the process up
     if count == 10:
@@ -186,11 +151,7 @@ np.savetxt('%iGeV_%ish_%ideg_%i%s_hist_%s.dat' % (data_card['ERANGE'],
                      '\n Distance to shower axis (m) | Phot_density_Cher/fluor (1/m2)'
                      )
            )
-print('Histogram stored into: %iGeV_%ish_%ideg_%i%s_hist_%s.dat'
-      % (data_card['ERANGE'],
-         data_card['NSHOW'],
-         data_card['THETAP'],
-         pointing_angle,
-         pointing,
-         type_of_hist)
+print('Histogram stored into: %iGeV_%ish_%ideg_%i%s_hist_%s.dat' %
+      (data_card['ERANGE'], data_card['NSHOW'], data_card['THETAP'],
+       pointing_angle, pointing, type_of_hist)
       )

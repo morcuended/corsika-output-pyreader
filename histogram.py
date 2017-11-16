@@ -1,5 +1,3 @@
-
-
 import numpy as np
 from scipy.io import FortranFile
 import pandas as pd
@@ -11,16 +9,14 @@ import matplotlib.style
 import matplotlib as mpl
 import sys, os
 
+def PhotonBunches(bunches, x_area, y_area, theta, nshower):
 
-def definition(x_area, y_area):
     """
-    Definition of the histogram depending on the detection area
+    Histogram photon bunches that reach observation level
     """
-    # global bunches, maxlen, ring, radius, hist_c, hist_f
-    # bunches = np.array([]).reshape(0, 7)
+
+    # Definition of the histogram depending on the detection area
     binsize = 10  # meters
-
-
     if x_area > y_area:
         # print("Histogram along x-axis...")
         type_of_hist = 'x'
@@ -52,19 +48,7 @@ def definition(x_area, y_area):
         mids = mids[0:numbins]
         ring = pi * ((radius[1:]) ** 2 - (radius[0:numbins]) ** 2)
 
-    hist_c = np.zeros((2, numbins))
-    hist_f = np.zeros((2, numbins))
-
-
-def PhotonBunches(bunches, x_area, y_area, theta, nshower):
-
-    # definition(x_area,y_area)
-    """
-    Histogram photon bunches that reach observation level
-    """
-
     # Should I avoid define histogram every time this function is called?
-    maxlen = max(x_area, y_area)
     fov = np.cos(5 * pi / 180)  # FoV contraint (+/- 5 deg)
     # Histogramming along x-axis
     if x_area > y_area:
