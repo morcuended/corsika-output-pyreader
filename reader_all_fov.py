@@ -5,19 +5,20 @@ from itertools import compress
 from astropy.io import ascii
 import sys
 
-''' 
+""" 
 Histogram Cherenkov and fluorescence photon bunches
 on the ground.
  
 Usage:
 
-    python reader.py path_to_output_file_from_CORSIKA DATACARD_file
+    python reader.py path_to_output_file path_to_DATACARD_file
 
 TO DO list:
+  (-) Use argparse instead of sys.argv
   (x) Establish a way of pointing the telescope to any direction
       via theta angle. 
-  (x) Ask if user wants on-axis pointing, if not, ask for the 
-      pointing angle of the telescope.
+  (x) Ask whether user wants to point telesocope on-axis or 
+      ask for a different pointing angle instead. 
   (-) Convert pointing angle to off-axis angle with respect to the 
       shower axis direction.
   (-) If any argument is passed, CER000001 should be set
@@ -27,7 +28,7 @@ TO DO list:
       corresponding shower direction for each one.
   (-) Check which dimension is the largest one, then histogram along
       that direction.
-'''
+"""
 
 print('\n-------  CORSIKA reader  -------')
 
