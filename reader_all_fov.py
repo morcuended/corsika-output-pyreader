@@ -45,7 +45,6 @@ def histogram(bunches, x_area, y_area, theta, nshower):
     # Histogram along x-axis
     if x_area > y_area:  
         weighted_pht = np.abs(bunches[:, 0]) / (binsize**2 * nshower)
-#        if with_fov == 'n': # all photons
         h, edges = np.histogram(1e-2 * bunches[:, 1],
                                 bins=distances,
                                 weights=weighted_pht,
@@ -66,13 +65,11 @@ def histogram(bunches, x_area, y_area, theta, nshower):
                                     )
     elif x_area < y_area:  
         weighted_pht = np.abs(bunches[:, 0]) / (binsize**2 * nshower)
-#        if with_fov == 'n': # all photons
         h, edges = np.histogram(1e-2 * bunches[:, 2],
                                 bins=distances,
                                 weights=weighted_pht,
                                 range=[0., maxlen]
                                 )
-#        else: # 10 deg FoV
         wemis = np.sqrt(1 - bunches[:, 3]**2 - bunches[:, 4]**2)
         # Pointing telescope along the shower direction (on-axis) 
         # if theta(tel)!=theta_p -> off-axis observation
@@ -153,7 +150,7 @@ file = FortranFile(sys.argv[1], 'r')
 binsize = 10  # meters
 
 if data_card['XCERARY'] > data_card['YCERARY']:
-    # print("Histogram along x-axis...")
+    print("Histogram along x-axis...")
     type_of_hist = 'x'
     maxlen = 1e-2 * data_card['XCERARY'] / 2
     numbins = int(maxlen / binsize)
@@ -163,7 +160,7 @@ if data_card['XCERARY'] > data_card['YCERARY']:
     mids = mids[0:numbins]
 
 elif data_card['XCERARY'] < data_card['YCERARY']:
-    # print("Histogram along y-axis...")
+    print("Histogram along y-axis...")
     type_of_hist = 'y'
     maxlen = 1e-2 * data_card['YCERARY'] / 2
     numbins = int(maxlen / binsize)
@@ -173,7 +170,7 @@ elif data_card['XCERARY'] < data_card['YCERARY']:
     mids = mids[0:numbins]
 
 else:
-    # print("Histogram radially...")
+    print("Histogram radially...")
     type_of_hist = 'r'
     maxlen = 1e-2 * data_card['XCERARY'] / 2
     numbins = int(maxlen / binsize)
@@ -186,6 +183,7 @@ else:
 bunches = np.array([]).reshape(0, 7)
 hist_c = np.zeros((2, numbins))
 hist_f = np.zeros((2, numbins))
+
 # Control and debugging counters:
 count = 0
 
