@@ -1,12 +1,8 @@
 from scipy.io import FortranFile
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
 from math import pi
 from itertools import compress
 from astropy.io import ascii
-import matplotlib.style
-import matplotlib as mpl
 import sys
 
 ''' 
@@ -26,8 +22,8 @@ Also, the "all" DATA CARD file must be in the same directory.
 TO DO list:
   (x) Establish a way of pointing the telescope to any direction
       via theta angle. 
-	(x) Ask if user wants onaxis pointing, if not, ask for the pointing 
-	  angle of the telescope.
+  (x) Ask if user wants onaxis pointing, if not, ask for the pointing 
+      angle of the telescope.
   (-) Convert pointing angle to off-axis angle with respect to the shower axis direction.
   (-) If any argument is passed, CER000001 should be set
       as default input file.
@@ -40,22 +36,20 @@ TO DO list:
   (-) Check which dimension is the largest one, then histogramming along
       that direction.
 '''
-print('')
-print('-------  CORSIKA reader  -------')
 
-#with_fov = input("Include FoV (y/n)? ")
+print('\n-------  CORSIKA reader  -------')
 
-# Function to histogram Cherenkov photons
-def histogram(bunches, x_area, y_area, theta):
-    fov = np.cos(5 * pi / 180) #FoV contraint (+/- 5 deg)
-    # Histogramming along x-axis
+
+def histogram(bunches, x_area, y_area, theta, nshower):
+    fov = np.cos(5 * pi / 180)  # FoV constraint (+/- 5 deg)
+    # Histogram along x-axis
     if x_area > y_area:  
         weighted_pht = np.abs(bunches[:, 0]) / (binsize**2 * nshower)
 #        if with_fov == 'n': # all photons
         h, edges = np.histogram(1e-2 * bunches[:, 1],
-                                bins = distances,
-                                weights = weighted_pht,
-                                range = [0., maxlen]
+                                bins=distances,
+                                weights=weighted_pht,
+                                range=[0., maxlen]
                                 )
 #        else: # 10 deg FoV
         wemis = np.sqrt(1-bunches[:, 3]**2 - bunches[:, 4]**2)
@@ -65,19 +59,19 @@ def histogram(bunches, x_area, y_area, theta):
         # where uemis=bunches[:,3]
         bunches_fov = bunches[wemis >= fov]
         weighted_pht_fov = weighted_pht[wemis >= fov]
-        h_fov,edges = np.histogram(1e-2 * bunches_fov[:, 1]
-	    		           , bins = distances
-	    		           , weights = weighted_pht_fov
-	    		           , range = [0., maxlen]
-                                   )
+        h_fov, edges = np.histogram(1e-2 * bunches_fov[:, 1],
+                                    bins=distances,
+                                    weights=weighted_pht_fov,
+                                    range=[0., maxlen]
+                                    )
     elif x_area < y_area:  
         weighted_pht = np.abs(bunches[:, 0]) / (binsize**2 * nshower)
 #        if with_fov == 'n': # all photons
-        h,edges = np.histogram(1e-2 * bunches[:, 2],
-                               bins = distances,
-                               weights = weighted_pht,
-                               range = [0., maxlen]
-                               )
+        h, edges = np.histogram(1e-2 * bunches[:, 2],
+                                bins=distances,
+                                weights=weighted_pht,
+                                range=[0., maxlen]
+                                )
 #        else: # 10 deg FoV
         wemis = np.sqrt(1 - bunches[:, 3]**2 - bunches[:, 4]**2)
         # Pointing telescope along the shower direction (on-axis) 
@@ -86,14 +80,13 @@ def histogram(bunches, x_area, y_area, theta):
         # where uemis=bunches[:,3]
         bunches_fov = bunches[wemis >= fov]
         weighted_pht_fov = weighted_pht[wemis >= fov]
-        h_fov,edges = np.histogram(1e-2 * bunches_fov[:, 2]
-				  , bins= distances
-				  , weights= weighted_pht_fov
-				  , range = [0., maxlen]
-                                  )
+        h_fov, edges = np.histogram(1e-2 * bunches_fov[:, 2],
+                                    bins=distances,
+                                    weights=weighted_pht_fov,
+                                    range=[0., maxlen]
+                                    )
     
-    
-    # Histogramming radially
+    # Histogram radially
     else:  
         r = np.sqrt((1e-2 * bunches[:, 1])**2 + (1e-2 * bunches[:, 2])**2)
         bunches = bunches[r < maxlen]
@@ -101,13 +94,11 @@ def histogram(bunches, x_area, y_area, theta):
         ring2 = ring[(r / (radius[1] - radius[0])).astype(int)]
         weighted_pht = np.abs(bunches[:, 0]) / (ring2 * nshower)
         # Store into an histogram
-#        if with_fov == 'n':
-        h, edges = np.histogram(r
-				, bins = radius
-				, weights = weighted_pht
-				, range = [0., maxlen]
-				)
-#        else:
+        h, edges = np.histogram(r,
+                                bins=radius,
+                                weights=weighted_pht,
+                                range=[0., maxlen]
+                                )
         wemis = np.sqrt(1 - bunches[:, 3]**2 - bunches[:, 4]**2)
         wemis = wemis * np.cos(-theta * pi / 180) + bunches[:, 3] * np.sin(-theta * pi / 180) 
         # where uemis=bunches[:,3]
@@ -115,45 +106,41 @@ def histogram(bunches, x_area, y_area, theta):
         r_fov = r[wemis >= fov]
         ring2_fov = ring[(r_fov / (radius[1] - radius[0])).astype(int)]
         weighted_pht_fov = np.abs(bunches_fov[:, 0]) / (ring2_fov * nshower)
-        h_fov, edges=np.histogram(r_fov
-				  , bins = radius
-				  , weights = weighted_pht_fov
-				  , range = [0.,maxlen]
-				  )
-    return(h, h_fov)
+        h_fov, edges = np.histogram(r_fov,
+                                    bins=radius,
+                                    weights=weighted_pht_fov,
+                                    range=[0., maxlen]
+                                    )
+    return h, h_fov
 
-# =========  DATA CARD =========
+
 with open(sys.argv[2], 'r') as f:
+    """
+    Read input variables from DATACARD
+    """
     read_data = f.read()
-    #print(read_data) 
-    datacard = ascii.read(read_data,format='fixed_width_no_header'
-			, delimiter=' '
-                        ,col_starts=(0, 8, 39))
-f.closed
+    datacard = ascii.read(read_data, format='fixed_width_no_header',
+                          delimiter=' ', col_starts=(0, 8, 39))
 
-nshower = int(datacard[2][1].split()[0])
-E_prim = float(datacard[5][1].split()[1])
-prim_part = int(datacard[3][1].split()[0])
-if prim_part == 1:
-    prim_part = 'gamma'
-if prim_part == 14:
-    prim_part = 'proton'
-seed1 = int(datacard[8][1].split()[0])
-seed2 = int(datacard[9][1].split()[0])
-theta_p = float(datacard[6][1].split()[0])
-phi_p = float(datacard[7][1].split()[0])
-obs_level = float(datacard[10][1].split()[0])
-obs_level = obs_level * 1e-2 #in meters
-atm_mod = int(datacard[18][1].split()[0])
-cersize = float(datacard[23][1].split()[0])
-fluorsize = float(datacard[24][1].split()[0])
-x_area = float(datacard[27][1].split()[4])
-y_area = float(datacard[27][1].split()[5])
+data_card = dict(NSHOW=int(datacard[2][1].split()[0]),
+                 ERANGE=float(datacard[5][1].split()[1]),
+                 PRMPAR=int(datacard[3][1].split()[0]),
+                 SEED1=int(datacard[8][1].split()[0]),
+                 SEED2=int(datacard[9][1].split()[0]),
+                 THETAP=float(datacard[6][1].split()[0]),
+                 PHIP=float(datacard[7][1].split()[0]),
+                 OBSLEV=float(datacard[10][1].split()[0]) * 1e-2,
+                 ATMOD=int(datacard[18][1].split()[0]),
+                 CERSIZ=float(datacard[23][1].split()[0]),
+                 FLSIZE=float(datacard[24][1].split()[0]),
+                 XCERARY=float(datacard[27][1].split()[4]),
+                 YCERARY=float(datacard[27][1].split()[5])
+                 )
 
 # Telescope pointing angle
 onaxis = input("On-axis pointing (y/n)? ")
 if onaxis == 'y':
-    pointing_angle = theta_p
+    pointing_angle = data_card['THETAP']
     pointing = 'onaxis'
 else:
     pointing_angle = input("Off-axis angle? ")
@@ -161,45 +148,49 @@ else:
 
 file = FortranFile(sys.argv[1], 'r')
 # Histograms definition
-binsize = 10 #meters
-if x_area > y_area:
-    maxlen  = 1e-2 * x_area / 2
-    print("Histogramming along x-axis...")
+binsize = 10  # meters
+
+if data_card['XCERARY'] > data_card['YCERARY']:
+    # print("Histogram along x-axis...")
     type_of_hist = 'x'
-elif x_area < y_area:
-    maxlen  = 1e-2 * y_area / 2
-    print("Histogramming along y-axis...")
-    type_of_hist = 'y'
-else:
-    type_of_hist = 'r'
-    print("Histogramming radially...")
-    maxlen  = 1e-2 * x_area / 2
-
-numbins = int(maxlen / binsize)
-breaks = numbins + 1
-bunches = np.array([]).reshape(0, 7)
-hist_c = np.zeros((2, numbins))
-hist_f = np.zeros((2, numbins))
-#with_fov='t'
-
-if x_area != y_area:
+    maxlen = 1e-2 * data_card['XCERARY'] / 2
+    numbins = int(maxlen / binsize)
+    breaks = numbins + 1
     distances = np.linspace(0, maxlen, breaks)
     mids = ((distances[1] - distances[0]) / 2) + distances
     mids = mids[0:numbins]
+
+elif data_card['XCERARY'] < data_card['YCERARY']:
+    # print("Histogram along y-axis...")
+    type_of_hist = 'y'
+    maxlen = 1e-2 * data_card['YCERARY'] / 2
+    numbins = int(maxlen / binsize)
+    breaks = numbins + 1
+    distances = np.linspace(0, maxlen, breaks)
+    mids = ((distances[1] - distances[0]) / 2) + distances
+    mids = mids[0:numbins]
+
 else:
+    # print("Histogram radially...")
+    type_of_hist = 'r'
+    maxlen = 1e-2 * data_card['XCERARY'] / 2
+    numbins = int(maxlen / binsize)
+    breaks = numbins + 1
     radius = np.linspace(0, maxlen, breaks)
     mids = ((radius[1] - radius[0]) / 2) + radius
     mids = mids[0:numbins]
-    ring = pi * ((radius[1:])**2 - (radius[0:numbins])**2)
+    ring = pi * ((radius[1:]) ** 2 - (radius[0:numbins]) ** 2)
 
+bunches = np.array([]).reshape(0, 7)
+hist_c = np.zeros((2, numbins))
+hist_f = np.zeros((2, numbins))
 # Control and debugging counters:
 count = 0
-lines = 0
-photons = 0
+
 
 while True:
     count = count + 1
-    # Sort data in 21 subblocks of 39 lines each
+    # Sort data in 21 sub-blocks of 39 lines each
     data = np.split(file.read_reals(dtype=np.float32).reshape(-1, 7), 21) 
     # It should be:
     # indices_boolean = [np.abs(i[0][0])<max(cersize,fluorsize) for i in data]
@@ -209,45 +200,72 @@ while True:
     bunches = bunches[np.all(bunches != 0, axis = 1)] # drop those lines containing only zeros 
 
     if count == 10:
-        lines = lines + len(bunches[bunches[:, 0] > 0]) + len(bunches[bunches[:,0] < 0])
-        photons = photons + np.sum(bunches[:, 0])
-        h_c = histogram(bunches[bunches[:, 0] > 0], x_area, y_area, pointing_angle)
-        h_f = histogram(bunches[bunches[:, 0] < 0], x_area, y_area, pointing_angle)
-        hist_c  = hist_c + h_c
-        hist_f  = hist_f + h_f
-        count = 0 # reset counter
-        bunches = np.array([]).reshape(0, 7) # reset array
+        h_c = histogram(bunches[bunches[:, 0] > 0],
+                        data_card['XCERARY'],
+                        data_card['YCERARY'],
+                        pointing_angle,
+                        data_card['NSHOW']
+                        )
+        h_f = histogram(bunches[bunches[:, 0] < 0],
+                        data_card['XCERARY'],
+                        data_card['YCERARY'],
+                        pointing_angle,
+                        data_card['NSHOW']
+                        )
+        hist_c = hist_c + h_c
+        hist_f = hist_f + h_f
+        count = 0  # reset counter
+        bunches = np.array([]).reshape(0, 7)  # reset array
     
-    if any( 3300 < i < 3303. for i in indices): #Flag indicating RUN END subblock
-        if count<10:
-            lines = lines + len(bunches[bunches[:, 0] > 0]) + len(bunches[bunches[:, 0] < 0])
-            photons = photons + np.sum(bunches[:, 0])
-            h_c = histogram(bunches[bunches[:, 0] > 0], x_area, y_area, pointing_angle)
-            h_f = histogram(bunches[bunches[:, 0] < 0], x_area, y_area, pointing_angle)
-            hist_c  = hist_c + h_c
-            hist_f  = hist_f + h_f
-            print(lines, ' lines (w/o zeros)')
-            print(photons,' photons')
+    if any(3300 < i < 3303. for i in indices):  # Flag indicating RUN END subblock
+        if count < 10:
+            h_c = histogram(bunches[bunches[:, 0] > 0],
+                            data_card['XCERARY'],
+                            data_card['YCERARY'],
+                            pointing_angle,
+                            data_card['NSHOW']
+                            )
+            h_f = histogram(bunches[bunches[:, 0] < 0],
+                            data_card['XCERARY'],
+                            data_card['YCERARY'],
+                            pointing_angle,
+                            data_card['NSHOW']
+                            )
+            hist_c = hist_c + h_c
+            hist_f = hist_f + h_f
         file.close()
         break
 
-np.savetxt('%iGeV_%ish_%ideg_%i%s_hist_%s.dat'%(E_prim,nshower,theta_p,pointing_angle,pointing,type_of_hist)
-  ,np.transpose([mids, hist_c[0], hist_c[1], hist_f[0], hist_f[1]])
-  ,newline = '\n'
-  ,fmt = "%7.2f %1.6e %1.6e %1.6e %1.6e"
-  ,header = (' Num_showers:%i \n E_primary (GeV): %i \n ID_prim_particle: %s \n Seeds: %i, %i \n'
-              %(nshower, E_prim, prim_part, seed1, seed2) +
-             ' Theta prim. part. incidence: %i deg \n Obs level (m): %i \n Atmosp model: %i'
-              %(theta_p, obs_level, atm_mod) +
-             '\n Cerenk_bunch_size: %i \n Fluor_bunch_size: %i'
-              %(cersize, fluorsize) +
-             '\n  \n Distance to shower axis (m) | Phot_density_Cher/fluor (1/m2)'
-             )
-            )
-print('Histogram stored into: %iGeV_%ish_%ideg_%i%s_hist_%s.dat'%
-      (E_prim, nshower, theta_p, pointing_angle, pointing, type_of_hist)
+np.savetxt('%iGeV_%ish_%ideg_%i%s_hist_%s.dat' % (data_card['ERANGE'],
+                                                  data_card['NSHOW'],
+                                                  data_card['THETAP'],
+                                                  pointing_angle,
+                                                  pointing,
+                                                  type_of_hist),
+           np.transpose([mids, hist_c[0], hist_c[1], hist_f[0], hist_f[1]])
+           , newline='\n'
+           , fmt="%7.2f %1.6e %1.6e %1.6e %1.6e"
+           , header=(' Num_showers:%i \n E_primary (GeV): %i \n ID_prim_particle: %s \n Seeds: %i, %i \n'
+                     % (data_card['NSHOW'],
+                        data_card['ERANGE'],
+                        data_card['PRMPAR'],
+                        data_card['SEED1'],
+                        data_card['SEED2'])
+                     +
+                     ' Theta prim. part. incidence: %i deg \n Obs level (m): %i \n Atmosp model: %i'
+                     % (data_card['THETAP'],
+                        data_card['OBSLEV'],
+                        data_card['ATMOD'])
+                     +
+                     '\n Cerenk_bunch_size: %i \n Fluor_bunch_size: %i'
+                     % (data_card['CERSIZ'], data_card['FLSIZE'])
+                     +
+                     '\n Distance to shower axis (m) | Phot_density_Cher/fluor (1/m2)'
+                     )
+           )
+print('Histogram stored into: %iGeV_%ish_%ideg_%i%s_hist_%s.dat' %
+      (data_card['ERANGE'], data_card['NSHOW'], data_card['THETAP'],
+       pointing_angle, pointing, type_of_hist)
       )
 
-
-print("Reading completed")
-print("-----------------", "\n")
+print("--------------------------------\n")
