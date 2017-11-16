@@ -28,6 +28,8 @@ TO DO:
       corresponding shower direction for each one.
   (-) Check which dimension is the largest one, then histogram along
       that direction.
+  (-) Read input CORSIKA arguments directly from Run/Events headers 
+      instead of the Data Card.
 """
 
 print('\n-------  CORSIKA reader  -------')
