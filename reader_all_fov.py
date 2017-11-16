@@ -33,23 +33,36 @@ TO DO list:
 print('\n-------  CORSIKA reader  -------')
 
 
-def histogram(bunches, x_area, y_area, theta, nshower):
+def histogram(photon_bunches, x_area, y_area, theta, nshower):
+    """
+    :param photon_bunches: array containing only photon bunches
+    sub-blocks. The information contained is:
+    [N_phot, x, y, uemis, vemis, t_emis, height of emission]
+    :param x_area: x dimension of detection area (in cm)
+    :param y_area: x dimension of detection area (in cm)
+    :param theta:
+    :param nshower: number of simulated showers
+    :return: photons histogrammed radially/along x or y-axis
+
+    Telescope is pointed toward theta direction
+    (see definition of wemis)
+        if theta(tel) != theta_p -> off-axis
+        if theta(tel) == theta_p -> on-axis
+
+    """
     fov = np.cos(5 * pi / 180)  # FoV constraint (+/- 5 deg)
     # Histogram along x-axis
     if x_area > y_area:  
-        weighted_pht = np.abs(bunches[:, 0]) / (binsize**2 * nshower)
-        h, edges = np.histogram(1e-2 * bunches[:, 1],
+        weighted_pht = np.abs(photon_bunches[:, 0]) / (binsize**2 * nshower)
+        h, edges = np.histogram(1e-2 * photon_bunches[:, 1],
                                 bins=distances,
                                 weights=weighted_pht,
                                 range=[0., maxlen]
                                 )
-#        else: # 10 deg FoV
-        wemis = np.sqrt(1-bunches[:, 3]**2 - bunches[:, 4]**2)
-        # Pointing the telescope along the shower direction (on-axis) 
-        # if theta(tel)!=theta_p -> off-axis observation
-        wemis = wemis * np.cos(-theta * pi / 180) + bunches[:, 3] * np.sin(-theta * pi / 180) 
-        # where uemis=bunches[:,3]
-        bunches_fov = bunches[wemis >= fov]
+        wemis = np.sqrt(1-photon_bunches[:, 3]**2 - photon_bunches[:, 4]**2)
+        # Pointing telescope along the shower direction (on-axis)
+        wemis = wemis * np.cos(-theta * pi / 180) + photon_bunches[:, 3] * np.sin(-theta * pi / 180)
+        bunches_fov = photon_bunches[wemis >= fov]
         weighted_pht_fov = weighted_pht[wemis >= fov]
         h_fov, edges = np.histogram(1e-2 * bunches_fov[:, 1],
                                     bins=distances,
@@ -57,18 +70,15 @@ def histogram(bunches, x_area, y_area, theta, nshower):
                                     range=[0., maxlen]
                                     )
     elif x_area < y_area:  
-        weighted_pht = np.abs(bunches[:, 0]) / (binsize**2 * nshower)
-        h, edges = np.histogram(1e-2 * bunches[:, 2],
+        weighted_pht = np.abs(photon_bunches[:, 0]) / (binsize**2 * nshower)
+        h, edges = np.histogram(1e-2 * photon_bunches[:, 2],
                                 bins=distances,
                                 weights=weighted_pht,
                                 range=[0., maxlen]
                                 )
-        wemis = np.sqrt(1 - bunches[:, 3]**2 - bunches[:, 4]**2)
-        # Pointing telescope along the shower direction (on-axis) 
-        # if theta(tel)!=theta_p -> off-axis observation
-        wemis = wemis * np.cos(-theta * pi / 180) + bunches[:, 3] * np.sin(-theta * pi / 180) 
-        # where uemis=bunches[:,3]
-        bunches_fov = bunches[wemis >= fov]
+        wemis = np.sqrt(1 - photon_bunches[:, 3]**2 - photon_bunches[:, 4]**2)
+        wemis = wemis * np.cos(-theta * pi / 180) + photon_bunches[:, 3] * np.sin(-theta * pi / 180)
+        bunches_fov = photon_bunches[wemis >= fov]
         weighted_pht_fov = weighted_pht[wemis >= fov]
         h_fov, edges = np.histogram(1e-2 * bunches_fov[:, 2],
                                     bins=distances,
@@ -78,21 +88,21 @@ def histogram(bunches, x_area, y_area, theta, nshower):
     
     # Histogram radially
     else:  
-        r = np.sqrt((1e-2 * bunches[:, 1])**2 + (1e-2 * bunches[:, 2])**2)
-        bunches = bunches[r < maxlen]
+        r = np.sqrt((1e-2 * photon_bunches[:, 1])**2 + (1e-2 * photon_bunches[:, 2])**2)
+        photon_bunches = photon_bunches[r < maxlen]
         r = r[r < maxlen]
         ring2 = ring[(r / (radius[1] - radius[0])).astype(int)]
-        weighted_pht = np.abs(bunches[:, 0]) / (ring2 * nshower)
-        # Store into an histogram
+        weighted_pht = np.abs(photon_bunches[:, 0]) / (ring2 * nshower)
+
+        # Store into the histogram
         h, edges = np.histogram(r,
                                 bins=radius,
                                 weights=weighted_pht,
                                 range=[0., maxlen]
                                 )
-        wemis = np.sqrt(1 - bunches[:, 3]**2 - bunches[:, 4]**2)
-        wemis = wemis * np.cos(-theta * pi / 180) + bunches[:, 3] * np.sin(-theta * pi / 180) 
-        # where uemis=bunches[:,3]
-        bunches_fov = bunches[wemis >= fov]
+        wemis = np.sqrt(1 - photon_bunches[:, 3]**2 - photon_bunches[:, 4]**2)
+        wemis = wemis * np.cos(-theta * pi / 180) + photon_bunches[:, 3] * np.sin(-theta * pi / 180)
+        bunches_fov = photon_bunches[wemis >= fov]
         r_fov = r[wemis >= fov]
         ring2_fov = ring[(r_fov / (radius[1] - radius[0])).astype(int)]
         weighted_pht_fov = np.abs(bunches_fov[:, 0]) / (ring2_fov * nshower)
