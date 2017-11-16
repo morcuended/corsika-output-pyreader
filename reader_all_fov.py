@@ -13,7 +13,7 @@ Usage:
 
     python reader.py path_to_output_file path_to_DATACARD_file
 
-TO DO list:
+TO DO:
   (-) Use argparse instead of sys.argv
   (x) Establish a way of pointing the telescope to any direction
       via theta angle. 
