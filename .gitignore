@@ -1,13 +1,12 @@
 # Compiled Python files
 __pycache__
+.idea/
 
 # CORSIKA output files
 CER*
 all
 
-.idea/
-
-# reader output files
+# reader output/test files
 *GeV*
 /Untitled.ipynb
 /test_notebook.ipynb
