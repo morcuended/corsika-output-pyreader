@@ -14,19 +14,19 @@ Usage:
     python reader.py path_to_output_file path_to_DATACARD_file
 
 TO DO:
-  (-) Use argparse instead of sys.argv
   (x) Establish a way of pointing the telescope to any direction
       via theta angle. 
   (x) Ask whether user wants to point telesocope on-axis or 
       ask for a different pointing angle instead. 
   (-) Convert pointing angle to off-axis angle with respect to the 
       shower axis direction.
+  (-) Use argparse instead of sys.argv
   (-) If any argument is passed, CER000001 should be set
       as default input file.
-  (-) Average x/y-histogram.The idea is to have to different DATACARD
+  (-) Average x/y-histogram. The idea is to have two different DATACARD
       with detector area defined along both axis (x/y) with the
       corresponding shower direction for each one.
-  (-) Check which dimension is the largest one, then histogram along
+  (x) Check which dimension is the largest one, then histogram along
       that direction.
   (-) Read input CORSIKA arguments directly from Run/Events headers 
       instead of the Data Card.
