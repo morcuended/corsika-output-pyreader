@@ -2,47 +2,39 @@ import numpy as np
 from math import pi
 
 
-def PhotonBunches(bunches, x_area, y_area, theta, nshower, definition="False"):
+def PhotonBunches(bunches, x_area, y_area, theta, nshower, definition):
     """
     Histogram photon bunches that reach observation level
     """
     binsize = 10  # meters
-    if definition == "True":
-        # Definition of the histogram depending on the detection area
-        if x_area > y_area:
-            # print("Histogram along x-axis...")
-            type_of_hist = 'x'
-            maxlen = 1e-2 * x_area / 2
-            numbins = int(maxlen / binsize)
-            breaks = numbins + 1
-            distances = np.linspace(0, maxlen, breaks)
-            mids = ((distances[1] - distances[0]) / 2) + distances
-            mids = mids[0:numbins]
+    maxlen = 0.5e-2 * max(x_area, y_area)
+    numbins = int(maxlen / binsize)
+    breaks = numbins + 1
+    distances = np.linspace(0, maxlen, breaks)
+    mids = ((distances[1] - distances[0]) / 2) + distances
+    mids = mids[0:numbins]
 
-        elif x_area < y_area:
-            # print("Histogram along y-axis...")
-            type_of_hist = 'y'
-            maxlen = 1e-2 * y_area / 2
-            numbins = int(maxlen / binsize)
-            breaks = numbins + 1
-            distances = np.linspace(0, maxlen, breaks)
-            mids = ((distances[1] - distances[0]) / 2) + distances
-            mids = mids[0:numbins]
+    # Definition of the histogram depending on the detection area
+    if x_area > y_area:
+        type_of_hist = 'x'
 
-        else:
-            # print("Histogram radially...")
-            type_of_hist = 'r'
-            maxlen = 1e-2 * x_area / 2
-            numbins = int(maxlen / binsize)
-            breaks = numbins + 1
-            radius = np.linspace(0, maxlen, breaks)
-            mids = ((radius[1] - radius[0]) / 2) + radius
-            mids = mids[0:numbins]
-            ring = pi * ((radius[1:]) ** 2 - (radius[0:numbins]) ** 2)
+    elif x_area < y_area:
+        type_of_hist = 'y'
 
-        hist_c = np.zeros((2, numbins))
-        hist_f = np.zeros((2, numbins))
+    else:
+        type_of_hist = 'r'
+        radius = np.linspace(0, maxlen, breaks)
+        mids = ((radius[1] - radius[0]) / 2) + radius
+        mids = mids[0:numbins]
+        ring = pi * ((radius[1:]) ** 2 - (radius[0:numbins]) ** 2)
 
+    hist_c = np.zeros((2, numbins))
+    hist_f = np.zeros((2, numbins))
+
+    if definition:
+        """
+        Return histogram characteristics just defined
+        """
         return type_of_hist, hist_c, hist_f, mids
 
     else:

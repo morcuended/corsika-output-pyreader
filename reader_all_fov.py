@@ -152,41 +152,28 @@ file = FortranFile(sys.argv[1], 'r')
 
 # Histograms definition
 binsize = 10  # meters
+maxlen = 0.5e-2 * max(data_card['XCERARY'], data_card['YCERARY'])
+numbins = int(maxlen / binsize)
+breaks = numbins + 1
+distances = np.linspace(0, maxlen, breaks)
+mids = ((distances[1] - distances[0]) / 2) + distances
+mids = mids[0:numbins]
+bunches = np.array([]).reshape(0, 7)
+hist_c = np.zeros((2, numbins))
+hist_f = np.zeros((2, numbins))
 
 if data_card['XCERARY'] > data_card['YCERARY']:
-    print("Histogram along x-axis...")
     type_of_hist = 'x'
-    maxlen = 1e-2 * data_card['XCERARY'] / 2
-    numbins = int(maxlen / binsize)
-    breaks = numbins + 1
-    distances = np.linspace(0, maxlen, breaks)
-    mids = ((distances[1] - distances[0]) / 2) + distances
-    mids = mids[0:numbins]
 
 elif data_card['XCERARY'] < data_card['YCERARY']:
-    print("Histogram along y-axis...")
     type_of_hist = 'y'
-    maxlen = 1e-2 * data_card['YCERARY'] / 2
-    numbins = int(maxlen / binsize)
-    breaks = numbins + 1
-    distances = np.linspace(0, maxlen, breaks)
-    mids = ((distances[1] - distances[0]) / 2) + distances
-    mids = mids[0:numbins]
 
 else:
-    print("Histogram radially...")
     type_of_hist = 'r'
-    maxlen = 1e-2 * data_card['XCERARY'] / 2
-    numbins = int(maxlen / binsize)
-    breaks = numbins + 1
     radius = np.linspace(0, maxlen, breaks)
     mids = ((radius[1] - radius[0]) / 2) + radius
     mids = mids[0:numbins]
     ring = pi * ((radius[1:]) ** 2 - (radius[0:numbins]) ** 2)
-
-bunches = np.array([]).reshape(0, 7)
-hist_c = np.zeros((2, numbins))
-hist_f = np.zeros((2, numbins))
 
 # Control and debugging counters:
 count = 0

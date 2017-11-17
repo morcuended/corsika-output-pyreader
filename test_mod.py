@@ -65,13 +65,15 @@ while True:
                                           data_card['XCERARY'],
                                           data_card['YCERARY'],
                                           pointing_angle,
-                                          data_card['NSHOW']
+                                          data_card['NSHOW'],
+                                          definition=False
                                           )
         h_f = histogram_mod.PhotonBunches(bunches[bunches[:, 0] < 0],
                                           data_card['XCERARY'],
                                           data_card['YCERARY'],
                                           pointing_angle,
-                                          data_card['NSHOW']
+                                          data_card['NSHOW'],
+                                          definition=False
                                           )
         hist_c = hist_c + h_c
         hist_f = hist_f + h_f
@@ -84,13 +86,15 @@ while True:
                                               data_card['XCERARY'],
                                               data_card['YCERARY'],
                                               pointing_angle,
-                                              data_card['NSHOW']
+                                              data_card['NSHOW'],
+                                              definition=False
                                               )
             h_f = histogram_mod.PhotonBunches(bunches[bunches[:, 0] < 0],
                                               data_card['XCERARY'],
                                               data_card['YCERARY'],
                                               pointing_angle,
-                                              data_card['NSHOW']
+                                              data_card['NSHOW'],
+                                              definition=False
                                               )
             hist_c = hist_c + h_c
             hist_f = hist_f + h_f
