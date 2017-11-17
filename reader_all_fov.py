@@ -50,7 +50,6 @@ def histogram(photon_bunches, x_area, y_area, theta, nshower):
     (see definition of wemis)
         if theta(tel) != theta_p -> off-axis
         if theta(tel) == theta_p -> on-axis
-
     """
     fov = np.cos(5 * pi / 180)  # FoV constraint (+/- 5 deg)
     # Histogram along x-axis
