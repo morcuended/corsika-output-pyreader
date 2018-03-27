@@ -7,7 +7,7 @@ Tested for [CORSIKA Version 7.6300](https://web.ikp.kit.edu/corsika/usersguide/u
 
 ### Create conda enviroment
 ```
-conda create -n [ENV_NAME] --file requirements.txt -c conda-forge
+conda create -n [ENV_NAME] --file requirements.txt
 ```
 
 ## Usage 
