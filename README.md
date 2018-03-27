@@ -1,9 +1,20 @@
-# corsika-output-pyreader
+# CORSIKA output reader
 
-Python modules to read Cherenkov photons sub-blocks from CORSIKA standard output taking both CERnnnnnn and steering card files as input arguments.
+Python-based script for reading and histogramming Cherenkov/Fluorescence photons from 
+CORSIKA standard output *CERnnnnnn* (without IACT option). It also perform 2D histograms 
+of both light components on the ground.
 
-The goal is to split the "reader.py" script into several modules
+Tested for CORSIKA Version 7.6300 (https://web.ikp.kit.edu/corsika/usersguide/usersguide.pdf) 
 
-So far only tested for CORSIKA Version 7.6300 (https://web.ikp.kit.edu/corsika/usersguide/usersguide.pdf) with just CERENKOV option enabled for grids of Cherenkov detectors at the ground. 
 
-Not implemented for IACT option yet.
+## Usage 
+```
+python reader.py --help
+```
+
+## Requirements:
+ - Python 3.6
+ - Numpy
+ - Numba
+ - Scipy
+ - Astropy
