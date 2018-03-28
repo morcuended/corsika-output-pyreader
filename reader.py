@@ -158,11 +158,11 @@ if not args.hist2d:
                fmt="%7.2f %1.6e %1.6e %1.6e %1.6e",
                header=(' Number of showers: %i \n Energy primary [GeV]: %i \n'
                        ' ID primary particle: %s \n'
-                       ' Seed for Cherenkov emission: %i \n'
+                       ' Seeds for sequences 1, 2, 3: %i, %i, %i \n'
                        % (dcard['NSHOW'],
                           dcard['ERANGE'],
                           dcard['PRMPAR'],
-                          dcard['SEED'])
+                          dcard['SEED'], dcard['SEED1'], dcard['SEED2'])
                        +
                        ' Theta primary particle [deg]: %i \n'
                        ' Observation level [cm]: %i \n'
